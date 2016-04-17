@@ -25,6 +25,7 @@ public class Respawner : MonoBehaviour
 
 	void Update()
 	{
+		if (!GameController.GameStarted) return;
 		if(respawnCo == null && transform.childCount < MaxEnemies)
 		{
 			respawnCo = StartCoroutine(RespawnFunction());
@@ -36,7 +37,10 @@ public class Respawner : MonoBehaviour
 		while(transform.childCount < MaxEnemies)
 		{
 			yield return new WaitForSeconds(RespawnDelay * Random.Range(0.5f, 1.5f));
-			Respawn();
+			if (GameController.GameStarted)
+			{
+				Respawn();
+			}
 		}
 		respawnCo = null;
 	}

@@ -7,6 +7,8 @@ public class ControlPlayerMovement : MonoBehaviour
 
 	void FixedUpdate()
 	{
+		if (!GameController.GameStarted) return;
+
 		var pos = transform.position;
 		pos.x += Speed * Input.GetAxis("Horizontal") * Time.fixedDeltaTime;
 		pos.y += Speed * Input.GetAxis("Vertical") * Time.fixedDeltaTime;

@@ -18,6 +18,8 @@ public class Bullet : MonoBehaviour
 
 	void FixedUpdate()
 	{
+		if (!GameController.GameStarted) return;
+
 		transform.position += direction * Speed * Time.fixedDeltaTime;
 		KillDistance -= Speed * Time.fixedDeltaTime;
 		if(KillDistance <= 0)

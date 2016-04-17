@@ -39,6 +39,7 @@ public class EnemyController : MonoBehaviour
 
 	void FixedUpdate()
 	{
+		if (!GameController.GameStarted) return;
 		if (player != null)
 		{
 			var v = player.transform.position - transform.position;
@@ -77,11 +78,13 @@ public class EnemyController : MonoBehaviour
 
 	void OnCollisionEnter2D(Collision2D coll)
 	{
+		if (!GameController.GameStarted) return;
 		if(coll.collider.GetComponent<Bullet>() != null)
 		{
 			if (level > 0)
 			{
 				SetLevel(level - 1);
+				gameController.EnemyHurt();
 			}
 			else
 			{
