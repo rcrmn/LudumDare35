@@ -11,6 +11,10 @@ public class EnemyController : MonoBehaviour
 
 	public float AttackForce = 4;
 
+	public Color PresidentColor;
+
+	bool isPresident = false;
+
 	int level = -1;
 
 	GameObject player;
@@ -19,22 +23,36 @@ public class EnemyController : MonoBehaviour
 
 	public void SetLevel(int min, int max)
 	{
-		SetLevel(Random.Range(min, max+1));
+		int lvl = Random.Range(min, max + 1);
+		lvl = System.Math.Min(lvl, LevelSkin.Length-2);
+		if(gameController == null)
+		{
+			gameController = GameObject.FindGameObjectWithTag("GameController").GetComponent<GameController>();
+		}
+
+		if(isPresident || gameController.ShouldSpawnPresident)
+		{
+			lvl = LevelSkin.Length - 1;
+			gameController.ShouldSpawnPresident = false;
+			GetComponent<SpriteRenderer>().color = PresidentColor;
+			isPresident = true;
+		}
+		SetLevel(lvl);
 	}
 
 	private void SetLevel(int lvl)
 	{
-		level = System.Math.Min(lvl, LevelSkin.Length-1);
+		level = lvl;
 		GetComponent<SpriteRenderer>().sprite = LevelSkin[level];
 	}
 
 	void Start()
 	{
+		gameController = GameObject.FindGameObjectWithTag("GameController").GetComponent<GameController>();
 		if (level < 0)
 		{
 			SetLevel(0, LevelSkin.Length - 1);
 		}
-		gameController = GameObject.FindGameObjectWithTag("GameController").GetComponent<GameController>();
 	}
 
 	void FixedUpdate()
@@ -89,7 +107,7 @@ public class EnemyController : MonoBehaviour
 			else
 			{
 				Destroy(gameObject);
-				gameController.EnemyKilled();
+				gameController.EnemyKilled(isPresident);
 			}
 		}
 	}

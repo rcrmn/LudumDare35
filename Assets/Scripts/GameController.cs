@@ -20,13 +20,23 @@ public class GameController : MonoBehaviour
 	public AudioClip EnemyKilledSound;
 	public AudioClip PlayerHurtSound;
 	public AudioClip PlayerLostSound;
+	public AudioClip PlayerWonSound;
 
 	public GameObject GameFinishedScreen;
+	public GameObject GameWonScreen;
 
 	public static bool GameStarted
 	{
 		get; private set;
 	}
+
+	public float TimeToSpawnPresident;
+	public int KillsToSpawnPresident;
+
+	public bool ShouldSpawnPresident;
+
+	bool ReadyToSpawnPresident;
+
 
 	int currentLife;
 	float timeToDamage = 0;
@@ -38,10 +48,27 @@ public class GameController : MonoBehaviour
 	void Start()
 	{
 		GameFinishedScreen.SetActive(false);
+		GameWonScreen.SetActive(false);
 		Cursor.SetCursor(cursor, new Vector2(cursor.width / 2, cursor.height / 2), CursorMode.Auto);
-		currentLife = PlayerLife;
 		audioS = GetComponent<AudioSource>();
+
+		currentLife = PlayerLife;
+		ShouldSpawnPresident = false;
 		GameStarted = true;
+
+		Invoke("SpawnPresident", TimeToSpawnPresident);
+	}
+
+	void SpawnPresident()
+	{
+		if (KillsToSpawnPresident <= enemiesKilled)
+		{
+			ShouldSpawnPresident = true;
+		}
+		else
+		{
+			ReadyToSpawnPresident = true;
+		}
 	}
 
 	// Update is called once per frame
@@ -72,11 +99,23 @@ public class GameController : MonoBehaviour
 		}
 	}
 
-	public void EnemyKilled()
+	public void EnemyKilled(bool isPresident)
 	{
 		enemiesKilled++;
 		EnemiesKilledLabel.text = enemiesKilled + " Kills";
 		audioS.PlayOneShot(EnemyKilledSound);
+		if(isPresident)
+		{
+			audioS.PlayOneShot(PlayerWonSound);
+			GameWonScreen.SetActive(true);
+			GameStarted = false;
+			Invoke("Restart", 3.5f);
+		}
+		if(ReadyToSpawnPresident && enemiesKilled >= KillsToSpawnPresident)
+		{
+			ReadyToSpawnPresident = false;
+			ShouldSpawnPresident = true;
+		}
 	}
 
 	public void EnemyHurt()
